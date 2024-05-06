@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Realtime Chat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+      body {
+        font-family: Roboto;
+      }
+    </style>
+  </head>
+  <body class="bg-dark">
+    <div class="container mt-5">
+      <center><h5 class="text-white">Room Chatingan</h5></center>
+      <div class="card mt-3">
+        <div class="card-body bg-secondary-subtle">
+          <h5><span id="totalUserOnline"></span> Orang Online</h5>
+          <div class="message-list" style="height: 40vh; overflow-y: auto">
+            <!-- Pesan dinamis akan ditambahkan di sini -->
+          </div>
+          <div id="form-message" class="mt-1">
+            <div class="row">
+              <div class="col-8">
+                <input class="form-control" id="message" />
+              </div>
+              <div class="col-4">
+                <button class="btn btn-primary" id="sendMessage">Kirim Pesan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+
+      socket.emit("join");
+      socket.on("message", (param) => {
+        $(".message-list").append(`
+        <div class="card mt-1">
+          <div class="card-body">${param.text}</div>
+        </div>
+      `);
+      });
+      socket.on("countUserOnline", (countUserOnline) => {
+        $("#totalUserOnline").text(countUserOnline);
+      });
+      $("#sendMessage").click(() => {
+        socket.emit("message", {
+          text: $("#message").val(),
+        });
+      });
+    </script>
+  </body>
+</html>
